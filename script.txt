@@ -46,10 +46,13 @@ def check_for_updates(version_url, script_url, script_name):
 
 def get_current_version(script_name):
     # Get version number from script file
-    with open(script_name, "r") as f:
+    with open(script_name, "r", encoding="utf-8", errors="ignore") as f:
         for line in f:
             if line.startswith("__version__"):
-                return tuple(map(int, line.strip().split('=')[1].strip().split('.')))
+                # Extract the version string
+                version_string = line.split('=')[1].strip().strip('"')
+                # Convert the version string to a tuple of integers
+                return tuple(map(int, version_string.split('.')))
 
 def download_and_execute_script(script_url, script_name):
     try:
@@ -58,8 +61,8 @@ def download_and_execute_script(script_url, script_name):
         response.raise_for_status()
 
         # Save the downloaded script to a local file
-        with open(script_name, "w") as f:
-            f.write(response.text)
+        with open(script_name, "wb") as f:
+            f.write(response.content)
 
         # Execute the downloaded script using subprocess
         print("Executing the downloaded script...")
@@ -68,14 +71,14 @@ def download_and_execute_script(script_url, script_name):
         print("Script executed successfully.")
 
     except requests.RequestException as e:
-        print("An error occurred while downloading the script:", e)
+        print("An error occurred while downloading or executing the script:", e)
 
 if __name__ == "__main__":
     # URL of the version file on GitHub
     version_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/version.txt"
     
     # URL of the script file on GitHub
-    script_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/script.py"
+    script_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/script.txt"
 
     # Name of the downloaded script file
     script_name = "DoxTracker.py"
