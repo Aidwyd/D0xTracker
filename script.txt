@@ -30,7 +30,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (1, 0, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 1, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
