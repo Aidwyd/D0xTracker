@@ -20,6 +20,9 @@ import subprocess
 from pathlib import Path
 import subprocess
 
+# Define the version of the script
+__version__ = "3.2.0"
+
 def check_for_updates(version_url, script_url, script_name):
     try:
         # Download version information
@@ -40,9 +43,6 @@ def check_for_updates(version_url, script_url, script_name):
 
     except requests.RequestException as e:
         print("An error occurred while checking for updates:", e)
-# This line declares the version of the script
-    __version__ = '2.1.0'
-   
 
 def get_current_version(script_name):
     # Get version number from script file
