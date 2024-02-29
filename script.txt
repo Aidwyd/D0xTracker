@@ -1,22 +1,25 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import time
-import webbrowser
+import sys, os, time, webbrowser
 import signal
 import pyperclip
 import pyautogui
+import time
 import ctypes
 import random
 import itertools
 import threading
+import sys
 import tkinter as tk
 import requests
 from packaging import version
+import os
 import subprocess
 from pathlib import Path
-import shutil
+import subprocess
+from pathlib import Path
+import subprocess
+
 
 def check_for_updates(version_url, script_url, script_name):
     try:
@@ -27,7 +30,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (3, 5, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 1, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -49,34 +52,33 @@ def download_and_execute_script(script_url, script_name):
         with open(script_name, "wb") as f:
             f.write(response.content)
 
-        # Execute PyInstaller to create a single executable file
-        print("Creating a single executable file...")
-        pyinstaller_command = f"python -m PyInstaller --onefile --icon=doxt.ico {script_name}"
-        subprocess.run(pyinstaller_command, shell=True)
-
-        # Get the name of the generated executable file
-        exe_name = os.path.splitext(script_name)[0] + '.exe'
-
-        # Check if the executable is on the desktop
-        desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
-        exe_path = os.path.join('dist', exe_name)
-        desktop_exe_path = os.path.join(desktop_path, exe_name)
-
-        if not os.path.exists(desktop_exe_path):
-            # If the executable is not on the desktop, move it to the desktop
-            shutil.move(exe_path, desktop_exe_path)
-        else:
-            # If the executable is already on the desktop, overwrite it with the new version
-            shutil.copy2(exe_path, desktop_exe_path)
-
-        # Run the generated executable
-        print("Running the script...")
-        subprocess.run([desktop_exe_path])
+        # Execute the downloaded script using subprocess
+        print("Executing the downloaded script...")
+        subprocess.run(["python", script_name])
 
         print("Script executed successfully.")
 
     except requests.RequestException as e:
         print("An error occurred while downloading the script:", e)
+
+if __name__ == "__main__":
+    # URL of the version file on GitHub
+    version_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/version.txt"
+    
+    # URL of the script file on GitHub
+    script_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/script.txt"
+
+    # Name of the downloaded script file
+    script_name = "DoxTracker.py"
+
+    # Check for updates and execute the script if a new version is available
+    check_for_updates(version_url, script_url, script_name)
+
+
+
+
+
+
 
 # Function to set the window title
 def set_window_title(title):
@@ -91,6 +93,11 @@ set_window_title("DoxTracker.eyz")
 # Sleep for the specified duration
 time.sleep(duration)
 
+
+
+
+
+
 done = False
 
 def animate():
@@ -100,7 +107,7 @@ def animate():
         sys.stdout.write(f'\rloading {c}')
         sys.stdout.flush()
         time.sleep(0.1)
-
+    
 t = threading.Thread(target=animate)
 t.start()
 
@@ -108,6 +115,7 @@ t.start()
 time.sleep(4)
 done = True
 
+        
 # Signal handler for Ctrl + D
 def signal_handler(signal, frame):
     KURO()
@@ -255,7 +263,9 @@ def PHONE():
     time.sleep(2)
     webbrowser.open('https://www.pagesjaunes.fr/annuaireinverse/recherche?quoiqui='+Num)
     time.sleep(2)
-    menu()
+menu()
+
+
 
 def DEAD():
     KURO()
@@ -328,3 +338,4 @@ def IP():
         menu()
 
 menu()
+
