@@ -27,7 +27,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (3, 5, 0)  # Replace with the current version of your application
+        current_version_tuple = (3, 4, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -54,29 +54,35 @@ def download_and_execute_script(script_url, script_name):
         pyinstaller_command = f"python -m PyInstaller --onefile --icon=doxt.ico {script_name}"
         subprocess.run(pyinstaller_command, shell=True)
 
-        # Get the name of the generated executable file
-        exe_name = os.path.splitext(script_name)[0] + '.exe'
+        # Check if the 'dist' directory exists
+        dist_dir = os.path.join(os.getcwd(), 'dist')
+        if os.path.exists(dist_dir):
+            # Get the name of the generated executable file
+            exe_name = os.path.splitext(script_name)[0] + '.exe'
+            exe_path = os.path.join(dist_dir, exe_name)
 
-        # Check if the executable is on the desktop
-        desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
-        exe_path = os.path.join('dist', exe_name)
-        desktop_exe_path = os.path.join(desktop_path, exe_name)
+            # Check if the executable is on the desktop
+            desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+            desktop_exe_path = os.path.join(desktop_path, exe_name)
 
-        if not os.path.exists(desktop_exe_path):
-            # If the executable is not on the desktop, move it to the desktop
-            shutil.move(exe_path, desktop_exe_path)
+            if not os.path.exists(desktop_exe_path):
+                # If the executable is not on the desktop, move it to the desktop
+                shutil.move(exe_path, desktop_exe_path)
+            else:
+                # If the executable is already on the desktop, overwrite it with the new version
+                shutil.copy2(exe_path, desktop_exe_path)
+
+            # Open and run the new version of the executable
+            print("Running the script...")
+            subprocess.run([desktop_exe_path])
         else:
-            # If the executable is already on the desktop, overwrite it with the new version
-            shutil.copy2(exe_path, desktop_exe_path)
-
-        # Run the generated executable
-        print("Running the script...")
-        subprocess.run([desktop_exe_path])
+            print("Error: 'dist' directory not found. PyInstaller might have failed to generate the executable.")
 
         print("Script executed successfully.")
 
     except requests.RequestException as e:
         print("An error occurred while downloading the script:", e)
+
         
 if __name__ == "__main__":
     # URL of the version file on GitHub
@@ -90,6 +96,7 @@ if __name__ == "__main__":
 
     # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
