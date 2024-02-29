@@ -16,10 +16,7 @@ from packaging import version
 import os
 import subprocess
 from pathlib import Path
-import subprocess
-from pathlib import Path
-import subprocess
-
+import shutil
 
 def check_for_updates(version_url, script_url, script_name):
     try:
@@ -60,9 +57,21 @@ def download_and_execute_script(script_url, script_name):
         # Get the name of the generated executable file
         exe_name = os.path.splitext(script_name)[0] + '.exe'
 
+        # Check if the executable is on the desktop
+        desktop_path = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+        exe_path = os.path.join('dist', exe_name)
+        desktop_exe_path = os.path.join(desktop_path, exe_name)
+
+        if not os.path.exists(desktop_exe_path):
+            # If the executable is not on the desktop, move it to the desktop
+            shutil.move(exe_path, desktop_exe_path)
+        else:
+            # If the executable is already on the desktop, overwrite it with the new version
+            shutil.copy2(exe_path, desktop_exe_path)
+
         # Run the generated executable
         print("Running the script...")
-        subprocess.run([os.path.join('dist', exe_name)])
+        subprocess.run([desktop_exe_path])
 
         print("Script executed successfully.")
 
