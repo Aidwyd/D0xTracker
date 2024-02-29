@@ -20,7 +20,6 @@ import subprocess
 from pathlib import Path
 import subprocess
 
-
 def check_for_updates(version_url, script_url, script_name):
     try:
         # Download version information
@@ -30,7 +29,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (3, 2, 0)  # Replace with the current version of your application
+        current_version_tuple = get_current_version(script_name)
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -41,6 +40,16 @@ def check_for_updates(version_url, script_url, script_name):
 
     except requests.RequestException as e:
         print("An error occurred while checking for updates:", e)
+# This line declares the version of the script
+    __version__ = '2.1.0'
+   
+
+def get_current_version(script_name):
+    # Get version number from script file
+    with open(script_name, "r") as f:
+        for line in f:
+            if line.startswith("__version__"):
+                return tuple(map(int, line.strip().split('=')[1].strip().split('.')))
 
 def download_and_execute_script(script_url, script_name):
     try:
@@ -49,38 +58,31 @@ def download_and_execute_script(script_url, script_name):
         response.raise_for_status()
 
         # Save the downloaded script to a local file
-        with open(script_name, "wb") as f:
-            f.write(response.content)
+        with open(script_name, "w") as f:
+            f.write(response.text)
 
-        # Execute PyInstaller to create a single executable file
-        print("Creating a single executable file...")
-        pyinstaller_command = f"python -m PyInstaller --onefile --icon=doxt.ico {script_name}"
-        subprocess.run(pyinstaller_command, shell=True)
-
-        # Get the name of the generated executable file
-        exe_name = os.path.splitext(script_name)[0] + '.exe'
-
-        # Run the generated executable
-        print("Running the script...")
-        subprocess.run([os.path.join('dist', exe_name)])
+        # Execute the downloaded script using subprocess
+        print("Executing the downloaded script...")
+        subprocess.run(["python", script_name])
 
         print("Script executed successfully.")
 
     except requests.RequestException as e:
         print("An error occurred while downloading the script:", e)
-        
+
 if __name__ == "__main__":
     # URL of the version file on GitHub
     version_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/version.txt"
     
     # URL of the script file on GitHub
-    script_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/script.txt"
+    script_url = "https://raw.githubusercontent.com/Aidwyd/D0xTracker/main/script.py"
 
     # Name of the downloaded script file
     script_name = "DoxTracker.py"
 
     # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
