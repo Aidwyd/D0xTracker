@@ -19,7 +19,11 @@ from pathlib import Path
 import subprocess
 from pathlib import Path
 import subprocess
-
+import requests
+import subprocess
+import os
+import shutil
+import sys
 
 def check_for_updates(version_url, script_url, script_name):
     try:
@@ -30,36 +34,38 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (4, 3, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
             print("A new version ({}) of the application is available.".format(latest_version))
-            download_and_execute_script(script_url, script_name)
+            create_new_executable(script_name)
         else:
             print("You're using the latest version ({}) of the application.".format('.'.join(map(str, current_version_tuple))))
 
     except requests.RequestException as e:
         print("An error occurred while checking for updates:", e)
 
-def download_and_execute_script(script_url, script_name):
+def create_new_executable(script_name):
     try:
-        # Download the script file from GitHub
-        response = requests.get(script_url)
-        response.raise_for_status()
+        # Run PyInstaller to create a new executable
+        print("Creating a new executable...")
+        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", script_name])
 
-        # Save the downloaded script to a local file
-        with open(script_name, "wb") as f:
-            f.write(response.content)
+        # Get the name of the generated executable file
+        exe_name = os.path.splitext(script_name)[0] + '.exe'
 
-        # Execute the downloaded script using subprocess
-        print("Executing the downloaded script...")
-        subprocess.run(["python", script_name])
+        # Move the new executable to desktop and downloads folder
+        desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
+        downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
 
-        print("Script executed successfully.")
+        shutil.move(exe_name, desktop_path)
+        shutil.copy(exe_name, downloads_path)
 
-    except requests.RequestException as e:
-        print("An error occurred while downloading the script:", e)
+        print("New executable created and saved to desktop and downloads folder.")
+
+    except Exception as e:
+        print("An error occurred while creating the new executable:", e)
 
 if __name__ == "__main__":
     # URL of the version file on GitHub
@@ -71,8 +77,9 @@ if __name__ == "__main__":
     # Name of the downloaded script file
     script_name = "DoxTracker.py"
 
-    # Check for updates and execute the script if a new version is available
+    # Check for updates and create new executable if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
