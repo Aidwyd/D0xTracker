@@ -65,7 +65,8 @@ def download_and_execute_script(script_url, script_name):
             f.write(response.content)
 
         # Execute the downloaded script
-        exec(open(script_name).read())
+        with open(script_name, "r", encoding="utf-8") as f:
+            exec(f.read())
 
         print("Script downloaded and executed successfully.")
 
