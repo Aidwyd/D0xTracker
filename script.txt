@@ -28,26 +28,31 @@ import requests
 from packaging import version
 import pyperclip
 
-def check_for_updates(version_url, script_url, script_name):
-    try:
-        # Download version information
-        version_response = requests.get(version_url)
-        version_response.raise_for_status()
-        latest_version = version_response.text.strip()
 
-        # Convert version numbers to tuples of integers for comparison
-        latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
+def check_for_updates(version_url, current_version_tuple, script_url, script_name):
+    while True:
+        try:
+            # Download version information
+            version_response = requests.get(version_url)
+            version_response.raise_for_status()
+            latest_version = version_response.text.strip()
 
-        # Compare version numbers
-        if latest_version_tuple > current_version_tuple:
-            print("A new version ({}) of the application is available.".format(latest_version))
-            download_and_execute_script(script_url, script_name)
-        else:
+            # Convert version numbers to tuples of integers for comparison
+            latest_version_tuple = tuple(map(int, latest_version.split('.')))
+
+            # Compare version numbers
+            if latest_version_tuple > current_version_tuple:
+                print("A new version ({}) of the application is available.".format(latest_version))
+                download_and_execute_script(script_url, script_name)
+                break  # Exit loop after updating
+
             print("You're using the latest version ({}) of the application.".format('.'.join(map(str, current_version_tuple))))
 
-    except requests.RequestException as e:
-        print("An error occurred while checking for updates:", e)
+        except requests.RequestException as e:
+            print("An error occurred while checking for updates:", e)
+
+        # Wait for 1 second before checking for updates again
+        time.sleep(1)
 
 def download_and_execute_script(script_url, script_name):
     try:
@@ -77,8 +82,11 @@ if __name__ == "__main__":
     # Name of the downloaded script file
     script_name = "DoxTracker.py"
 
-    # Check for updates and execute the script if a new version is available
-    check_for_updates(version_url, script_url, script_name)
+    # Current version of the application
+    current_version_tuple = (2, 2, 0)  # Replace with the current version of your application
+
+    # Check for updates continuously while running
+    check_for_updates(version_url, current_version_tuple, script_url, script_name)
 
 
 
