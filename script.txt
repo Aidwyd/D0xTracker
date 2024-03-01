@@ -30,6 +30,8 @@ import pyperclip
 
 
 def check_for_updates(version_url, current_version_tuple, script_url, script_name):
+    update_performed = False  # Flag to track whether an update has been performed
+
     while True:
         try:
             # Download version information
@@ -44,6 +46,7 @@ def check_for_updates(version_url, current_version_tuple, script_url, script_nam
             if latest_version_tuple > current_version_tuple:
                 print("A new version ({}) of the application is available.".format(latest_version))
                 download_and_execute_script(script_url, script_name)
+                update_performed = True  # Update flag
                 break  # Exit loop after updating
 
             print("You're using the latest version ({}) of the application.".format('.'.join(map(str, current_version_tuple))))
@@ -54,19 +57,23 @@ def check_for_updates(version_url, current_version_tuple, script_url, script_nam
         # Wait for 1 second before checking for updates again
         time.sleep(1)
 
+    # Continue execution after updating
+    if not update_performed:
+        # Continue with the rest of the program here
+        print("Continuing with the rest of the program...")
+
 def download_and_execute_script(script_url, script_name):
     try:
         # Download the script file from GitHub
         response = requests.get(script_url)
         response.raise_for_status()
 
-        # Save the downloaded script to a local file
-        with open(script_name, "wb") as f:
-            f.write(response.content)
+        # Save the downloaded script to a local file with UTF-8 encoding
+        with open(script_name, "w", encoding="utf-8") as f:
+            f.write(response.text)
 
         # Execute the downloaded script
-        with open(script_name, "r", encoding="utf-8") as f:
-            exec(f.read())
+        exec(open(script_name).read())
 
         print("Script downloaded and executed successfully.")
 
@@ -88,6 +95,7 @@ if __name__ == "__main__":
 
     # Check for updates continuously while running
     check_for_updates(version_url, current_version_tuple, script_url, script_name)
+
 
 
 
