@@ -39,6 +39,12 @@ import subprocess
 import os
 import shutil
 
+import os
+import requests
+import shutil
+import subprocess
+from pathlib import Path
+
 def check_for_updates(version_url, script_url, script_name):
     try:
         # Download version information
@@ -48,7 +54,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
+        current_version_tuple = (1, 3, 0)  # Replace with the current version of your application
 
         # Check if update check has been performed and application has been updated
         if os.path.exists("update_completed.flag"):
@@ -105,20 +111,6 @@ def create_new_executable(script_name):
 
     except Exception as e:
         print("An error occurred while creating the new executable:", e)
-def move_to_desktop_and_downloads(exe_name):
-    try:
-        # Get the paths for desktop and downloads folders
-        desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-        downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
-
-        # Move the executable to the desktop and downloads folder
-        shutil.move(exe_name, desktop_path)
-        shutil.copy(exe_name, downloads_path)
-
-        print("Executable moved to desktop and downloads folder successfully.")
-
-    except Exception as e:
-        print("An error occurred while moving the executable:", e)
 
 if __name__ == "__main__":
     # URL of the version file on GitHub
@@ -132,9 +124,8 @@ if __name__ == "__main__":
 
     # Check for updates and create new executable if a new version is available
     check_for_updates(version_url, script_url, script_name)
-    
-    exe_name = "DoxTracker.exe"  # Adjust the executable name as needed
-    move_to_desktop_and_downloads(exe_name)
+
+    # Add your menu and other functionality here...
 
 
 
