@@ -25,6 +25,12 @@ import os
 import shutil
 import sys
 
+import requests
+import subprocess
+import os
+import shutil
+import sys
+
 def check_for_updates(version_url, script_url, script_name):
     try:
         # Download version information
@@ -50,7 +56,18 @@ def create_new_executable(script_name):
     try:
         # Run PyInstaller to create a new executable
         print("Creating a new executable...")
-        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", script_name])
+
+        # Create an internal folder
+        internal_folder = "internal"
+        if not os.path.exists(internal_folder):
+            os.makedirs(internal_folder)
+
+        # Move the script file to the internal folder
+        internal_script_path = os.path.join(internal_folder, script_name)
+        shutil.move(script_name, internal_script_path)
+
+        # Create the new executable inside the internal folder
+        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", internal_script_path])
 
         # Get the name of the generated executable file
         exe_name = os.path.splitext(script_name)[0] + '.exe'
@@ -59,8 +76,8 @@ def create_new_executable(script_name):
         desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
         downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
 
-        shutil.move(exe_name, desktop_path)
-        shutil.copy(exe_name, downloads_path)
+        shutil.move(os.path.join("internal", exe_name), desktop_path)
+        shutil.copy(os.path.join("internal", exe_name), downloads_path)
 
         print("New executable created and saved to desktop and downloads folder.")
 
@@ -79,8 +96,6 @@ if __name__ == "__main__":
 
     # Check for updates and create new executable if a new version is available
     check_for_updates(version_url, script_url, script_name)
-
-
 
 
 
