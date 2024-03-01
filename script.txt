@@ -54,7 +54,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (1, 3, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
 
         # Check if update check has been performed and application has been updated
         if os.path.exists("update_completed.flag"):
