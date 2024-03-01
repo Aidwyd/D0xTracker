@@ -30,6 +30,10 @@ import subprocess
 import os
 import shutil
 import sys
+import requests
+import subprocess
+import os
+import shutil
 
 def check_for_updates(version_url, script_url, script_name):
     try:
@@ -41,6 +45,11 @@ def check_for_updates(version_url, script_url, script_name):
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
         current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
+
+        # Check if update check has been performed and application has been updated
+        if os.path.exists("update_completed.flag"):
+            print("Update check already performed and application updated.")
+            return
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -57,17 +66,11 @@ def create_new_executable(script_name):
         # Run PyInstaller to create a new executable
         print("Creating a new executable...")
 
-        # Create an internal folder
-        internal_folder = "internal"
-        if not os.path.exists(internal_folder):
-            os.makedirs(internal_folder)
-
         # Move the script file to the internal folder
-        internal_script_path = os.path.join(internal_folder, script_name)
-        shutil.move(script_name, internal_script_path)
+        shutil.move(script_name, "internal/{}".format(script_name))
 
         # Create the new executable inside the internal folder
-        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", internal_script_path])
+        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", "internal/{}".format(script_name)])
 
         # Get the name of the generated executable file
         exe_name = os.path.splitext(script_name)[0] + '.exe'
@@ -78,6 +81,10 @@ def create_new_executable(script_name):
 
         shutil.move(os.path.join("internal", exe_name), desktop_path)
         shutil.copy(os.path.join("internal", exe_name), downloads_path)
+
+        # Create a flag file to indicate that the update process has been completed
+        with open("update_completed.flag", "w"):
+            pass
 
         print("New executable created and saved to desktop and downloads folder.")
 
@@ -96,6 +103,7 @@ if __name__ == "__main__":
 
     # Check for updates and create new executable if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
