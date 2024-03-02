@@ -19,31 +19,7 @@ from pathlib import Path
 import subprocess
 from pathlib import Path
 import subprocess
-import requests
-import subprocess
-import os
-import shutil
-import sys
-import platform
-import requests
-import subprocess
-import os
-import shutil
-import sys
-import requests
-import subprocess
-import os
-import shutil
-import requests
-import subprocess
-import os
-import shutil
 
-import os
-import requests
-import shutil
-import subprocess
-from pathlib import Path
 
 def check_for_updates(version_url, script_url, script_name):
     try:
@@ -56,61 +32,34 @@ def check_for_updates(version_url, script_url, script_name):
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
         current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
 
-        # Check if update check has been performed and application has been updated
-        if os.path.exists("update_completed.flag"):
-            print("Update check already performed and application updated.")
-            return
-
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
             print("A new version ({}) of the application is available.".format(latest_version))
-            create_new_executable(script_name)
+            download_and_execute_script(script_url, script_name)
         else:
             print("You're using the latest version ({}) of the application.".format('.'.join(map(str, current_version_tuple))))
 
     except requests.RequestException as e:
         print("An error occurred while checking for updates:", e)
 
-def create_new_executable(script_name):
+def download_and_execute_script(script_url, script_name):
     try:
-        # Run PyInstaller to create a new executable
-        print("Creating a new executable...")
+        # Download the script file from GitHub
+        response = requests.get(script_url)
+        response.raise_for_status()
 
-        # Ensure the internal folder exists
-        internal_folder = "internal"
-        if not os.path.exists(internal_folder):
-            os.makedirs(internal_folder)
+        # Save the downloaded script to a local file
+        with open(script_name, "wb") as f:
+            f.write(response.content)
 
-        # Move the script file to the internal folder
-        shutil.move(script_name, os.path.join(internal_folder, script_name))
+        # Execute the downloaded script using subprocess
+        print("Executing the downloaded script...")
+        subprocess.run(["python", script_name])
 
-        # Change directory to internal folder
-        os.chdir(internal_folder)
+        print("Script executed successfully.")
 
-        # Create the new executable inside the internal folder
-        subprocess.run(["python", "-m", "PyInstaller", "--onefile", "--icon=doxt.ico", script_name])
-
-        # Get the name of the generated executable file
-        exe_name = os.path.splitext(script_name)[0] + '.exe'
-
-        # Move the new executable to the parent directory
-        shutil.move(os.path.join("dist", exe_name), os.path.join("..", exe_name))
-
-        # Move the new executable to desktop and downloads folder
-        desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
-        downloads_path = os.path.join(os.path.expanduser('~'), 'Downloads')
-
-        shutil.move(os.path.join("..", exe_name), desktop_path)
-        shutil.copy(os.path.join("..", exe_name), downloads_path)
-
-        # Create a flag file to indicate that the update process has been completed
-        with open("update_completed.flag", "w"):
-            pass
-
-        print("New executable created and saved to desktop and downloads folder.")
-
-    except Exception as e:
-        print("An error occurred while creating the new executable:", e)
+    except requests.RequestException as e:
+        print("An error occurred while downloading the script:", e)
 
 if __name__ == "__main__":
     # URL of the version file on GitHub
@@ -122,10 +71,8 @@ if __name__ == "__main__":
     # Name of the downloaded script file
     script_name = "DoxTracker.py"
 
-    # Check for updates and create new executable if a new version is available
+    # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
-
-    # Add your menu and other functionality here...
 
 
 
