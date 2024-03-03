@@ -19,6 +19,49 @@ from pathlib import Path
 import subprocess
 from pathlib import Path
 import subprocess
+from colorama import init, Fore, Back, Style
+import time
+import time
+
+def fade_in_logo(logo_text):
+    for i in range(1, 101):
+        clear_screen()
+        print(fade_color(logo_text, i))
+        time.sleep(0.03)
+
+def fade_out_logo(logo_text):
+    for i in range(100, 0, -1):
+        clear_screen()
+        print(fade_color(logo_text, i))
+        time.sleep(0.03)
+
+def fade_color(text, percent):
+    color = "\033[1;31m"  # Red color code
+    reset_color = "\033[0m"  # Reset color code
+    return f"{color}{text[:int(len(text)/2)]}\033[1;32m{text[int(len(text)/2):]}{reset_color}"
+
+def clear_screen():
+    print("\033c", end="")
+
+if __name__ == "__main__":
+    # Your startup logo text
+    logo_text = """\
+  888b.             88888                8
+  8   8 .d8b. Yb dP   8   8d8b .d88 .d8b 8 .dP .d88b 8d8b
+  8   8 8' .8   `8.    8   8P   8  8  88b  8.dP' 8P
+  88P' `Y8P' dP Yb   8    `Y88 `Y8bP Yb `Y88P 8
+"""
+
+    # Fade in the logo
+    fade_in_logo(logo_text)
+
+    # Simulate loading
+    print("Loading...")
+    time.sleep(2)  # Simulating loading time
+
+    # Fade out the logo
+    fade_out_logo(logo_text)
+
 
 
 def check_for_updates(version_url, script_url, script_name):
@@ -30,7 +73,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (2, 4, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 3, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
