@@ -21,6 +21,10 @@ from pathlib import Path
 import subprocess
 
 
+import requests
+import subprocess
+import sys
+
 def check_for_updates(version_url, script_url, script_name):
     try:
         # Download version information
@@ -45,15 +49,25 @@ def check_for_updates(version_url, script_url, script_name):
 def download_and_execute_script(script_url, script_name):
     try:
         # Download the script file from GitHub
-        response = requests.get(script_url)
+        response = requests.get(script_url, stream=True)
         response.raise_for_status()
+
+        # Get the total file size for the progress bar
+        total_size = int(response.headers.get('content-length', 0))
+        downloaded_size = 0
 
         # Save the downloaded script to a local file
         with open(script_name, "wb") as f:
-            f.write(response.content)
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+                    downloaded_size += len(chunk)
+                    progress = downloaded_size / total_size * 100
+                    sys.stdout.write("\rDownloading... {:.2f}%".format(progress))
+                    sys.stdout.flush()
 
         # Execute the downloaded script using subprocess
-        print("Executing the downloaded script...")
+        print("\nExecuting the downloaded script...")
         subprocess.run(["python", script_name])
 
         print("Script executed successfully.")
@@ -73,6 +87,7 @@ if __name__ == "__main__":
 
     # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
