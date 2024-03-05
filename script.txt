@@ -24,9 +24,20 @@ import subprocess
 import requests
 import subprocess
 import sys
+import os
+
+CONFIG_FILE = "update_config.txt"
 
 def check_for_updates(version_url, script_url, script_name):
     try:
+        # Check if the update has already been performed
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, "r") as f:
+                update_flag = f.read().strip()
+            if update_flag == "updated":
+                print("The application has already been updated.")
+                return
+
         # Download version information
         version_response = requests.get(version_url)
         version_response.raise_for_status()
@@ -67,11 +78,19 @@ def download_and_execute_script(script_url, script_name):
                     sys.stdout.write("\rDownloading... {:.2f}%".format(progress))
                     sys.stdout.flush()
 
-        # Execute the downloaded script using subprocess
+        # Ensure progress bar reaches 100% after completion
+        sys.stdout.write("\rDownloading... 100.00%")
+        sys.stdout.flush()
         print("\nExecuting the downloaded script...")
+        
+        # Execute the downloaded script using subprocess
         subprocess.run(["python", script_name])
 
         print("Script executed successfully.")
+
+        # Update the flag to indicate that the application has been updated
+        with open(CONFIG_FILE, "w") as f:
+            f.write("updated")
 
     except requests.RequestException as e:
         print("An error occurred while downloading the script:", e)
@@ -88,6 +107,8 @@ if __name__ == "__main__":
 
     # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
+
 
 
 
