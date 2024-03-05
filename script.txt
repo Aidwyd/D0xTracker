@@ -34,7 +34,7 @@ def check_for_updates(version_url, script_url, script_name):
 
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
-        current_version_tuple = (2, 4, 0)  # Replace with the current version of your application
+        current_version_tuple = (2, 5, 0)  # Replace with the current version of your application
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -62,7 +62,8 @@ def download_and_execute_script(script_url, script_name):
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
                     downloaded_size += len(chunk)
-                    progress = downloaded_size / total_size * 100
+                    # Ensure progress does not exceed 100%
+                    progress = min(downloaded_size / total_size * 100, 100)
                     sys.stdout.write("\rDownloading... {:.2f}%".format(progress))
                     sys.stdout.flush()
 
@@ -87,6 +88,7 @@ if __name__ == "__main__":
 
     # Check for updates and execute the script if a new version is available
     check_for_updates(version_url, script_url, script_name)
+
 
 
 
