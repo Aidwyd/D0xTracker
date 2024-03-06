@@ -43,9 +43,14 @@ def check_for_updates(version_url, script_url, script_name):
         version_response.raise_for_status()
         latest_version = version_response.text.strip()
 
+        print("Latest version:", latest_version)
+
         # Convert version numbers to tuples of integers for comparison
         latest_version_tuple = tuple(map(int, latest_version.split('.')))
         current_version_tuple = (2, 7, 0)  # Replace with the current version of your application
+
+        print("Latest version tuple:", latest_version_tuple)
+        print("Current version tuple:", current_version_tuple)
 
         # Compare version numbers
         if latest_version_tuple > current_version_tuple:
@@ -53,9 +58,14 @@ def check_for_updates(version_url, script_url, script_name):
             download_and_execute_script(script_url, script_name)
         else:
             print("You're using the latest version ({}) of the application.".format('.'.join(map(str, current_version_tuple))))
+            # Update the flag to indicate that the application has been checked for updates
+            with open(CONFIG_FILE, "w") as f:
+                f.write("updated")
 
     except requests.RequestException as e:
         print("An error occurred while checking for updates:", e)
+
+
 
 def download_and_execute_script(script_url, script_name):
     try:
